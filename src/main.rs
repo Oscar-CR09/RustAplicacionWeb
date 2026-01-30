@@ -29,7 +29,7 @@ fn handle_connection(mut stream:TcpStream){
     println!("Peticion recibida!");
     println!("{}", String::from_utf8_lossy(&buffer[..]));
 
-    let get =b"GET / HTTP/1.1\r\n";//127.0.0.1:8081
+    let get =b"GET /index HTTP/1.1\r\n";//127.0.0.1:8081
 
     if buffer.starts_with(get) {
         
@@ -43,7 +43,42 @@ fn handle_connection(mut stream:TcpStream){
 
 fn send_index(mut stream: TcpStream) {
     // Intentamos leer el archivo. Usamos match en lugar de unwrap
-    let (status_line, contents) = match fs::read_to_string("index.html") {
+    /*let (status_line, contents) = match fs::read_to_string("index.html") {
+        Ok(c) => ("HTTP/1.1 200 OK", c),
+        Err(_) => (
+            "HTTP/1.1 404 NOT FOUND",
+            String::from("<!DOCTYPE html><html><body><h1>404 - Archivo no encontrado</h1><p>Asegurate de crear index.html en la carpeta correcta.</p></body></html>")
+        ),
+    };
+*/
+    // Intentamos leer el archivo "index.html"
+    // Si falla, leemos "404.html"
+    let (status_line, filename) = if std::path::Path::new("index.html").exists() {
+        ("HTTP/1.1 200 OK", "index.html")
+    } else {
+        ("HTTP/1.1 404 NOT FOUND", "404.html")
+    };
+
+    // Leemos el contenido del archivo seleccionado
+    // Usamos unwrap_or para evitar que el servidor se caiga (panic) si el 404.html tampoco existe
+    let contents = fs::read_to_string(filename).unwrap_or_else(|_| {
+        String::from("<h1>Error Crítico</h1><p>No se encontró ni index.html ni 404.html</p>")
+    });
+
+    let response = format!(
+        "{}\r\nContent-Length: {}\r\n\r\n{}",
+        status_line,
+        contents.len(),
+        contents
+    );
+
+    stream.write(response.as_bytes()).unwrap();
+    stream.flush().unwrap();
+}
+
+fn send_not_found(mut stream: TcpStream) {
+    // Intentamos leer el archivo. Usamos match en lugar de unwrap
+    let (status_line, contents) = match fs::read_to_string("404.html") {
         Ok(c) => ("HTTP/1.1 200 OK", c),
         Err(_) => (
             "HTTP/1.1 404 NOT FOUND",

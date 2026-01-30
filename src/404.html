@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Plano No Encontrado</title>
+    <style>
+        :root {
+            --blueprint-bg: #002b55; /* Azul oscuro estilo plano */
+            --blueprint-line: rgba(255, 255, 255, 0.1);
+            --text-color: #fff;
+            --accent: #ffcc00; /* Amarillo seguridad */
+        }
+
+        body {
+            background-color: var(--blueprint-bg);
+            /* Patrón de cuadrícula estilo CAD */
+            background-image: 
+                linear-gradient(var(--blueprint-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--blueprint-line) 1px, transparent 1px);
+            background-size: 40px 40px;
+            color: var(--text-color);
+            font-family: 'Courier New', Courier, monospace; /* Fuente técnica */
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .container {
+            border: 4px solid var(--text-color);
+            padding: 3rem;
+            background: rgba(0, 43, 85, 0.9);
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            max-width: 600px;
+            position: relative;
+        }
+
+        /* Decoración de esquinas estilo acotación */
+        .container::before, .container::after {
+            content: '+';
+            position: absolute;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        .container::before { top: 5px; left: 5px; }
+        .container::after { bottom: 5px; right: 5px; }
+
+        h1 {
+            font-size: 5rem;
+            margin: 0;
+            color: var(--accent);
+            text-shadow: 2px 2px 0px #000;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            border-bottom: 2px solid var(--text-color);
+            display: inline-block;
+            padding-bottom: 5px;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            background-color: transparent;
+            color: var(--accent);
+            border: 2px solid var(--accent);
+            padding: 10px 20px;
+            font-size: 1rem;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover {
+            background-color: var(--accent);
+            color: var(--blueprint-bg);
+            cursor: pointer;
+        }
+
+        /* --- Animación de Engranaje CSS --- */
+        .gear-system {
+            margin-bottom: 2rem;
+            position: relative;
+            height: 100px;
+            width: 100px;
+            margin: 0 auto 2rem;
+        }
+
+        .gear {
+            width: 80px;
+            height: 80px;
+            background: transparent;
+            border: 8px dashed var(--text-color);
+            border-radius: 50%;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            animation: spin 10s linear infinite;
+        }
+
+        .gear::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            background: var(--blueprint-bg);
+            border: 4px solid var(--text-color);
+            border-radius: 50%;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Pie de página estilo info de plano */
+        .technical-info {
+            margin-top: 2rem;
+            font-size: 0.8rem;
+            opacity: 0.7;
+            border-top: 1px solid var(--text-color);
+            padding-top: 10px;
+            width: 100%;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="gear-system">
+            <div class="gear"></div>
+        </div>
+        
+        <h1>404</h1>
+        <h2>FALLA EN EL SISTEMA</h2>
+        
+        <p>
+            <strong>ESTADO:</strong> Archivo no localizado.<br>
+            El plano o recurso que intentas visualizar no existe en este directorio o ha sido movido.
+        </p>
+
+        <a href="/" class="btn">REINICIAR SISTEMA (VOLVER AL INICIO)</a>
+
+        <div class="technical-info">
+            ERR_CODE: FILE_NOT_FOUND_EXCEPTION<br>
+            PROJECT: RUST_SERVER_V1
+        </div>
+    </div>
+
+</body>
+</html>
