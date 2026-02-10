@@ -1,116 +1,58 @@
+use std::fs;
+use std::io::prelude::*;
 use std::net::TcpListener;
 use std::net::TcpStream;
-use std::io::prelude::*;
-use std::fs;
 
 fn main() {
-    // iniciar un servidor 
-    let address="127.0.0.1:8081";
-    let listener =TcpListener::bind(&address).unwrap();    
-    println!("Servidor iniciado {}", &address);
-    // escuchar por conexiones 
-    for stream in listener.incoming(){
-        let stream= stream.unwrap();
-        println!("Stream recibido");
+    // Escuchar en el puerto 8081
+    let address = "127.0.0.1:8081";
+    let listener = TcpListener::bind(&address).unwrap();
+    println!("Servidor iniciado en: http://{}", address);
 
+    for stream in listener.incoming() {
+        let stream = stream.unwrap();
         handle_connection(stream);
     }
- 
-    
-  
 }
 
-   //manejar estas conexiones 
-fn handle_connection(mut stream:TcpStream){
-    let mut buffer=[0;1024];
-
+fn handle_connection(mut stream: TcpStream) {
+    let mut buffer = [0; 1024];
     stream.read(&mut buffer).unwrap();
 
-    println!("Peticion recibida!");
-    println!("{}", String::from_utf8_lossy(&buffer[..]));
+    // Convertimos el buffer a String para facilitar la comparación
+    let request = String::from_utf8_lossy(&buffer[..]);
 
-    let get =b"GET /index HTTP/1.1\r\n";//127.0.0.1:8081
+    // Imprimimos la petición para depurar
+    // println!("Request: {}", request);
 
-    if buffer.starts_with(get) {
-        
-        // responder al cliente
-        send_index(stream);
+    // Verificamos si piden la raíz "/" o "/index.html"
+    let is_root = request.starts_with("GET / HTTP/1.1");
+    let is_index = request.starts_with("GET /index.html HTTP/1.1");
 
-    }else{
-        send_not_found(stream);
-    }
-}
-
-fn send_index(mut stream: TcpStream) {
-    // Intentamos leer el archivo. Usamos match en lugar de unwrap
-    /*let (status_line, contents) = match fs::read_to_string("index.html") {
-        Ok(c) => ("HTTP/1.1 200 OK", c),
-        Err(_) => (
-            "HTTP/1.1 404 NOT FOUND",
-            String::from("<!DOCTYPE html><html><body><h1>404 - Archivo no encontrado</h1><p>Asegurate de crear index.html en la carpeta correcta.</p></body></html>")
-        ),
-    };
-*/
-    // Intentamos leer el archivo "index.html"
-    // Si falla, leemos "404.html"
-    let (status_line, filename) = if std::path::Path::new("index.html").exists() {
-        ("HTTP/1.1 200 OK", "index.html")
+    if is_root || is_index {
+        send_file(stream, "index.html", "HTTP/1.1 200 OK");
     } else {
-        ("HTTP/1.1 404 NOT FOUND", "404.html")
-    };
-
-    // Leemos el contenido del archivo seleccionado
-    // Usamos unwrap_or para evitar que el servidor se caiga (panic) si el 404.html tampoco existe
-    let contents = fs::read_to_string(filename).unwrap_or_else(|_| {
-        String::from("<h1>Error Crítico</h1><p>No se encontró ni index.html ni 404.html</p>")
-    });
-
-    let response = format!(
-        "{}\r\nContent-Length: {}\r\n\r\n{}",
-        status_line,
-        contents.len(),
-        contents
-    );
-
-    stream.write(response.as_bytes()).unwrap();
-    stream.flush().unwrap();
-}
-
-fn send_not_found(mut stream: TcpStream) {
-    // Intentamos leer el archivo. Usamos match en lugar de unwrap
-    let (status_line, contents) = match fs::read_to_string("404.html") {
-        Ok(c) => ("HTTP/1.1 200 OK", c),
-        Err(_) => (
-            "HTTP/1.1 404 NOT FOUND",
-            String::from("<!DOCTYPE html><html><body><h1>404 - Archivo no encontrado</h1><p>Asegurate de crear index.html en la carpeta correcta.</p></body></html>")
-        ),
-    };
-
-    let response = format!(
-        "{}\r\nContent-Length: {}\r\n\r\n{}",
-        status_line,
-        contents.len(),
-        contents
-    );
-
-    stream.write(response.as_bytes()).unwrap();
-    stream.flush().unwrap();
-}
-
-/* 
-fn send_to_client(mut stream:TcpStream){
-
-    let contents=fs::read_to_string("index.html").unwrap();
-    
-    let response=format!("HTTP/1.1 200 OK\r\nContent-Length: {}\r\n\r\n{}",
-    contents.len(),
-    contents
-    ); // format carriege return. \r
-    //line feed LF - CRLF \n
-
-    stream.write(response.as_bytes()).unwrap();
-    stream.flush().unwrap();
+        send_file(stream, "404.html", "HTTP/1.1 404 NOT FOUND");
     }
-*/
+}
 
+// Unifiqué tus funciones send_index y send_not_found en una sola más flexible
+fn send_file(mut stream: TcpStream, filename: &str, status_line: &str) {
+    let contents = match fs::read_to_string(filename) {
+        Ok(c) => c,
+        Err(_) => {
+            // Si el archivo (ej. 404.html) tampoco existe, devolvemos un HTML de emergencia
+            String::from("<!DOCTYPE html><html><body><h1>Error de Servidor</h1><p>Archivo no encontrado.</p></body></html>")
+        }
+    };
 
+    let response = format!(
+        "{}\r\nContent-Length: {}\r\n\r\n{}",
+        status_line,
+        contents.len(),
+        contents
+    );
+
+    stream.write(response.as_bytes()).unwrap();
+    stream.flush().unwrap();
+}
