@@ -6,14 +6,11 @@
 
 ¡Bienvenido a mi portafolio personal! Este proyecto no es solo una muestra de mi trabajo, sino también una demostración de desarrollo web moderno utilizando **Rust** para generar un sitio estático seguro, rápido y eficiente.
 
-Puedes ver el sitio en vivo aquí: **[ENLACE_A_TU_GITHUB_PAGE]**
+Puedes ver el sitio en vivo aquí: 
 
 ## 🚀 Tecnologías Utilizadas
 
 * **Lenguaje Principal:** [Rust](https://www.rust-lang.org/) 🦀
-* **Compilación:** WebAssembly (WASM) / Generador Estático (Zola/Yew)
-* **Despliegue:** GitHub Pages
-* **Estilos:** CSS3 / [Tu Framework CSS si usaste alguno, ej: Tailwind]
 
 ## 🛠️ Instalación y Ejecución Local
 
@@ -45,13 +42,6 @@ Si deseas clonar y correr este portafolio en tu máquina local:
 * `src/`: Código fuente en Rust.
 * `static/`: Archivos estáticos (imágenes, CSS).
 * `dist/` o `public/`: El sitio compilado listo para producción.
-
-## 📫 Contacto
-
-Si te interesa mi trabajo o quieres hablar sobre Rust:
-
-* **LinkedIn:** [Tu Link Aquí]
-* **Email:** [Tu Email Aquí]
 
 ---
 _Desarrollado con ❤️ y mucho código en Rust._
